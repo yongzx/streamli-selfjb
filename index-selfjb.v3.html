@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SelfJB Self-Jailbreaking Annotation Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .upload-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .main-layout {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .content-panel {
+            flex: 1;
+            min-width: 0;
+        }
+        .field-section {
+            margin-bottom: 20px;
+        }
+        .field-section h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .field-display {
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+            line-height: 1.6;
+            font-size: 14px;
+            white-space: pre-wrap;
+            min-height: 60px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+            color: #666;
+        }
+        .sentences-section {
+            margin-top: 20px;
+        }
+        .sentence-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .sentence-table th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        .sentence-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        .sentence-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .sentence-text {
+            max-width: 500px;
+            word-wrap: break-word;
+        }
+        .checkbox-cell {
+            text-align: center;
+            width: 100px;
+        }
+        .selfjb-checkbox {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+        .control-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .navigation-btn {
+            background-color: #607D8B;
+            color: white;
+        }
+        .navigation-btn:hover {
+            background-color: #455A64;
+        }
+        .navigation-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .save-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .save-btn:hover {
+            background-color: #45a049;
+        }
+        .export-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        .export-btn:hover {
+            background-color: #1976D2;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .error {
+            color: #f44336;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            color: #4CAF50;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e8f5e8;
+            border-radius: 4px;
+            display: none;
+        }
+        #fileInput {
+            margin: 10px 0;
+        }
+        .stats-panel {
+            width: 300px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .stats-section {
+            margin-bottom: 20px;
+        }
+        .stats-section h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+            background-color: #e3f2fd;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.3s ease;
+        }
+        .id-column {
+            width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+        }
+        .selfjb-true {
+            background-color: #ffebee !important;
+        }
+        .selfjb-false {
+            background-color: #e8f5e8 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SelfJB Self-Jailbreaking Annotation Tool</h1>
+
+        <div class="upload-section">
+            <h3>Upload JSONL File</h3>
+            <input type="file" id="fileInput" accept=".jsonl">
+            <div class="loading">Loading and processing file...</div>
+            <div class="error" id="errorMsg"></div>
+            <div class="success" id="successMsg"></div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn navigation-btn" onclick="previousEntry()" style="display:none;" id="prevBtn">
+                ← Previous
+            </button>
+            <span id="entryInfo" style="margin: 0 20px; font-size: 16px; display:none;"></span>
+            <button class="control-btn navigation-btn" onclick="nextEntry()" style="display:none;" id="nextBtn">
+                Next →
+            </button>
+            <button class="control-btn save-btn" onclick="saveCorrections()" style="display:none;" id="saveBtn">
+                Save Corrections
+            </button>
+            <button class="control-btn export-btn" onclick="exportCorrected()" style="display:none;" id="exportBtn">
+                Export Corrected JSONL
+            </button>
+        </div>
+
+        <div class="main-layout" id="mainLayout" style="display:none;">
+            <div class="content-panel">
+                <div class="field-section">
+                    <h3>Raw Prompt</h3>
+                    <div class="field-display" id="rawPromptDisplay"></div>
+                </div>
+
+                <div class="sentences-section">
+                    <h3>Sentences and Self-Jailbreaking Annotations</h3>
+                    <table class="sentence-table" id="sentenceTable">
+                        <thead>
+                            <tr>
+                                <th class="id-column">ID</th>
+                                <th>Sentence</th>
+                                <th class="checkbox-cell">Self-Jailbreaking</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sentenceTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="field-section">
+                    <h3>Final Answer</h3>
+                    <div class="field-display" id="finalAnswerDisplay"></div>
+                </div>
+            </div>
+
+            <div class="stats-panel">
+                <div class="stats-section">
+                    <h4>Review Progress</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div id="progressText">0% reviewed</div>
+                </div>
+
+                <div class="stats-section">
+                    <h4>Current Entry Stats</h4>
+                    <div id="currentStats"></div>
+                </div>
+
+                <div class="stats-section">
+                    <h4>Instructions</h4>
+                    <p style="font-size: 12px; line-height: 1.4;">
+                        • Check the boxes for sentences that contain self-jailbreaking content<br>
+                        • Uncheck boxes for incorrectly annotated sentences<br>
+                        • Red background = marked as self-jailbreaking<br>
+                        • Green background = marked as safe
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let entries = [];
+        let currentEntryIndex = 0;
+        let corrections = {}; // Store corrections for each entry
+
+        document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.querySelector('.loading').style.display = 'block';
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('successMsg').style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to process file');
+                }
+
+                const data = await response.json();
+                entries = data.entries;
+                corrections = {}; // Reset corrections
+
+                document.querySelector('.loading').style.display = 'none';
+
+                if (entries.length > 0) {
+                    currentEntryIndex = 0;
+                    displayEntry(currentEntryIndex);
+                    document.getElementById('mainLayout').style.display = 'flex';
+                    document.getElementById('prevBtn').style.display = 'inline-block';
+                    document.getElementById('nextBtn').style.display = 'inline-block';
+                    document.getElementById('entryInfo').style.display = 'inline-block';
+                    document.getElementById('saveBtn').style.display = 'inline-block';
+                    document.getElementById('exportBtn').style.display = 'inline-block';
+                    updateNavigationButtons();
+                    updateProgress();
+                } else {
+                    throw new Error('No entries found in the file');
+                }
+
+            } catch (error) {
+                document.querySelector('.loading').style.display = 'none';
+                document.getElementById('errorMsg').textContent = 'Error: ' + error.message;
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+
+        function displayEntry(index) {
+            currentEntryIndex = index;
+            const entry = entries[index];
+
+            // Display basic fields
+            document.getElementById('rawPromptDisplay').textContent = entry.raw_prompt || 'No raw prompt available';
+            document.getElementById('finalAnswerDisplay').textContent = entry.final_answer || 'No final answer available';
+
+            // Display sentences table
+            const tbody = document.getElementById('sentenceTableBody');
+            tbody.innerHTML = '';
+
+            entry.sentences.forEach((sentence, sentenceIndex) => {
+                const row = document.createElement('tr');
+
+                // Get current correction or original annotation
+                const currentSelfjb = corrections[index] && corrections[index][sentenceIndex] !== undefined
+                    ? corrections[index][sentenceIndex]
+                    : sentence.corrected_selfjb;
+
+                row.className = currentSelfjb ? 'selfjb-true' : 'selfjb-false';
+
+                row.innerHTML = `
+                    <td class="id-column">${sentence.id}</td>
+                    <td class="sentence-text">${sentence.text}</td>
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="selfjb-checkbox"
+                               ${currentSelfjb ? 'checked' : ''}
+                               onchange="updateSelfjb(${index}, ${sentenceIndex}, this.checked)">
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+            updateNavigationButtons();
+            updateCurrentStats();
+            updateProgress();
+        }
+
+        function updateSelfjb(entryIndex, sentenceIndex, isSelfjb) {
+            if (!corrections[entryIndex]) {
+                corrections[entryIndex] = {};
+            }
+
+            const originalSelfjb = entries[entryIndex].sentences[sentenceIndex].is_selfjb;
+
+            if (isSelfjb === originalSelfjb) {
+                // Remove correction if it matches original
+                delete corrections[entryIndex][sentenceIndex];
+                if (Object.keys(corrections[entryIndex]).length === 0) {
+                    delete corrections[entryIndex];
+                }
+            } else {
+                corrections[entryIndex][sentenceIndex] = isSelfjb;
+            }
+
+            // Update the row background color
+            const row = document.querySelector(`#sentenceTableBody tr:nth-child(${sentenceIndex + 1})`);
+            row.className = isSelfjb ? 'selfjb-true' : 'selfjb-false';
+
+            updateCurrentStats();
+            updateProgress();
+        }
+
+        function updateCurrentStats() {
+            const entry = entries[currentEntryIndex];
+            const entryCorrections = corrections[currentEntryIndex] || {};
+
+            let selfjbCount = 0;
+            let correctedCount = 0;
+
+            entry.sentences.forEach((sentence, index) => {
+                const currentSelfjb = entryCorrections[index] !== undefined
+                    ? entryCorrections[index]
+                    : sentence.is_selfjb;
+
+                if (currentSelfjb) selfjbCount++;
+                if (entryCorrections[index] !== undefined) correctedCount++;
+            });
+
+            let statsHtml = `
+                <div class="stat-item">
+                    <span>Total sentences:</span>
+                    <span>${entry.sentences.length}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Self-jailbreaking:</span>
+                    <span>${selfjbCount}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Safe sentences:</span>
+                    <span>${entry.sentences.length - selfjbCount}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Corrections made:</span>
+                    <span>${correctedCount}</span>
+                </div>
+            `;
+
+            document.getElementById('currentStats').innerHTML = statsHtml;
+        }
+
+        function updateProgress() {
+            const totalEntries = entries.length;
+            const reviewedEntries = Object.keys(corrections).length;
+            const percentage = totalEntries > 0 ? Math.round((reviewedEntries / totalEntries) * 100) : 0;
+
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = `${percentage}% reviewed (${reviewedEntries}/${totalEntries})`;
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const entryInfo = document.getElementById('entryInfo');
+
+            prevBtn.disabled = currentEntryIndex === 0;
+            nextBtn.disabled = currentEntryIndex === entries.length - 1;
+
+            entryInfo.textContent = `Entry ${currentEntryIndex + 1} of ${entries.length}`;
+        }
+
+        function previousEntry() {
+            if (currentEntryIndex > 0) {
+                displayEntry(currentEntryIndex - 1);
+            }
+        }
+
+        function nextEntry() {
+            if (currentEntryIndex < entries.length - 1) {
+                displayEntry(currentEntryIndex + 1);
+            }
+        }
+
+        async function saveCorrections() {
+            try {
+                const response = await fetch('/save_corrections', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        entry_index: currentEntryIndex,
+                        corrections: corrections[currentEntryIndex] || {}
+                    })
+                });
+
+                if (response.ok) {
+                    document.getElementById('successMsg').textContent = 'Corrections saved successfully!';
+                    document.getElementById('successMsg').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('successMsg').style.display = 'none';
+                    }, 3000);
+                } else {
+                    throw new Error('Failed to save corrections');
+                }
+            } catch (error) {
+                document.getElementById('errorMsg').textContent = 'Error saving corrections: ' + error.message;
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+
+        async function exportCorrected() {
+            try {
+                // Apply all corrections to entries
+                const entriesWithCorrections = entries.map((entry, index) => {
+                    const entryCorrections = corrections[index] || {};
+                    const correctedSentences = entry.sentences.map((sentence, sentenceIndex) => {
+                        return {
+                            ...sentence,
+                            corrected_selfjb: entryCorrections[sentenceIndex] !== undefined
+                                ? entryCorrections[sentenceIndex]
+                                : sentence.is_selfjb
+                        };
+                    });
+
+                    return {
+                        ...entry,
+                        sentences: correctedSentences
+                    };
+                });
+
+                const response = await fetch('/export_corrected', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        entries: entriesWithCorrections
+                    })
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'corrected_selfjb_annotations.jsonl';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    document.getElementById('successMsg').textContent = 'Corrected JSONL exported successfully!';
+                    document.getElementById('successMsg').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('successMsg').style.display = 'none';
+                    }, 3000);
+                } else {
+                    throw new Error('Failed to export corrected data');
+                }
+            } catch (error) {
+                document.getElementById('errorMsg').textContent = 'Error exporting data: ' + error.message;
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
